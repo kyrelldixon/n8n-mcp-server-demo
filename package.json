@@ -1,0 +1,21 @@
+{
+  "name": "fastmcp-boilerplate",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "bun run src/index.ts",
+    "dev": "fastmcp dev src/index.ts",
+    "inspect": "fastmcp inspect src/index.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "fastmcp": "^2.1.4",
+    "zod": "^3.25.36"
+  }
+}
