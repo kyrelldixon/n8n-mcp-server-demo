@@ -1,6 +1,6 @@
 import { FastMCP } from "fastmcp";
 import { z } from "zod";
-import { triggerWebhook } from "./trigger-webhook";
+import redaxios from "redaxios";
 import { add } from "./add";
 import { UserError } from "fastmcp";
 
@@ -26,27 +26,39 @@ server.addTool({
   }),
 });
 
-const WebhookPayloadSchema = z.object({
-  webhookUrl: z.string().optional().describe("The webhook URL you want to trigger. If not provided, the webhook URL from the environment variable will be used."),
-  idea: z.string().describe("The idea you want to send to n8n for processing"),
+export async function startWorkflow<WorkflowInput>(webhookUrl: string, payload: WorkflowInput) {
+  try {
+    const response = await redaxios.post(webhookUrl, payload);
+    return JSON.stringify(response.data, null, 2);
+  } catch (error) {
+    console.error("Error triggering webhook:", error);
+    throw new UserError("Error triggering webhook");
+  }
+}
+
+// You can send any type of data to n8n for processing. Create different zod schemas that match the data you want to send.
+const WorkflowInputSchema = z.object({
+  input: z.string().describe("The input you want to send to n8n for processing"),
 });
+
+export type WorkflowInput = z.infer<typeof WorkflowInputSchema>;
 
 server.addTool({
   annotations: {
     openWorldHint: true,
     readOnlyHint: true,
-    title: "Trigger Webhook",
+    title: "Start Workflow",
   },
-  description: "Trigger a webhook with an idea as the payload",
-  execute: async (args) => {
-    const url = args.webhookUrl || process.env.WEBHOOK_URL;
+  description: "Start a workflow by triggering a webhook with a payload",
+  execute: async (webhookInput) => {
+    const url = process.env.WEBHOOK_URL;
     if (!url) {
-      throw new UserError("WEBHOOK_URL is not set. Update .env file.");
+      throw new UserError("WEBHOOK_URL is not set. Update .env file or set WEBHOOK_URL");
     }
-    return await triggerWebhook(url, { idea: args.idea });
+    return await startWorkflow<WorkflowInput>(url, webhookInput);
   },
-  name: "trigger-webhook",
-  parameters: WebhookPayloadSchema,
+  name: "start-workflow",
+  parameters: WorkflowInputSchema,
 });
 
 server.start({
