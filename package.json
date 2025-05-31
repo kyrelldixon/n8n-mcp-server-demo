@@ -5,8 +5,9 @@
   "private": true,
   "scripts": {
     "start": "bun run src/index.ts",
-    "dev": "fastmcp dev src/index.ts",
-    "inspect": "fastmcp inspect src/index.ts"
+    "dev": "fastmcp inspect src/index.ts",
+    "cli": "fastmcp dev src/index.ts",
+    "test": "bun test"
   },
   "devDependencies": {
     "@types/bun": "latest"
