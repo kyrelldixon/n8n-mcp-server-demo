@@ -38,7 +38,7 @@ export async function startWorkflow<WorkflowInput>(webhookUrl: string, payload: 
 
 // You can send any type of data to n8n for processing. Create different zod schemas that match the data you want to send.
 const WorkflowInputSchema = z.object({
-  input: z.string().describe("The input you want to send to n8n for processing"),
+  input: z.string().describe("Some string"),
 });
 
 export type WorkflowInput = z.infer<typeof WorkflowInputSchema>;
@@ -51,9 +51,10 @@ server.addTool({
   },
   description: "Start a workflow by triggering a webhook with a payload",
   execute: async (webhookInput) => {
-    const url = process.env.WEBHOOK_URL;
+    // Make sure you set this URL to be your n8n webhook URL
+    const url = ""
     if (!url) {
-      throw new UserError("WEBHOOK_URL is not set. Update .env file or set WEBHOOK_URL");
+      throw new UserError("The webhook URL is not set. Go to ./src/index.ts and set the webhook URL.");
     }
     return await startWorkflow<WorkflowInput>(url, webhookInput);
   },
